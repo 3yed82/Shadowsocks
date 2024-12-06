@@ -1,6 +1,6 @@
-# واکشی پیکربندی
-# Config Fetcher
-**Config Fetcher** is a simple and functional Python script that is used to fetch and save Shadowsocks configs from specified addresses.   This program fetches configs files, checks them, and saves them to a file called "configs.json" along with some default information.
+
+# Shadowsocks Fetcher
+**Shadowsocks Fetcher** is a simple and functional Python script that is used to fetch and save Shadowsocks configs from specified addresses.   This program fetches configs files, checks them, and saves them to a file called "configs.json" along with some default information.
 
 ## configs.json is updated every day
 
@@ -15,6 +15,6 @@
 
 **SUB LINK** :
 
-``POV-Ray SDL
+```POV-Ray SDL
 https://raw.githubusercontent.com/3yed-61/Shadowsocks/refs/heads/main/configs.txt
 ```
