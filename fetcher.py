@@ -1,11 +1,11 @@
 import requests
 import base64
-import logging
 import re
+import logging
 
 # Logging configuration
 logging.basicConfig(
-    level=logging.INFO,
+    level=logging.DEBUG,  # Set level to DEBUG to get more detailed logs
     format='%(asctime)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger(__name__)
@@ -17,7 +17,7 @@ URL = "https://raw.githubusercontent.com/3yed82/telegram-configs-collector/refs/
 OUTPUT_FILE = "configs.txt"
 
 # Header to include in the output file
-HEADER = """//profile-title: base64:4pmo77iPM867zp7EkChTaGFkb3dzb2Nrcyk=
+HEADER = """//profile-title: base64:4pyU77iPM867zp7EkPCflLgoU2hhZG93c29ja3Mp
 //profile-update-interval: 24
 //subscription-userinfo: upload=5368709120; download=445097156608; total=955630223360; expire=1762677732
 //support-url: https://t.me/talk_to_3yed_bot
@@ -38,7 +38,6 @@ def fetch_content(url):
         logger.error(f"Failed to fetch content: {e}")
         return None
 
-
 def decode_base64(content):
     """Decode Base64 content."""
     try:
@@ -49,40 +48,48 @@ def decode_base64(content):
         logger.error(f"Failed to decode Base64 content: {e}")
         return None
 
-
 def clean_config(config_line):
-    """Clean and extract the valid Shadowsocks configuration."""
-    # Extract only the valid ss:// portion
-    match = re.match(r"(ss://[a-zA-Z0-9+/=]+@[^#\s]+)", config_line)
-    return match.group(1) if match else None
-
+    """Clean and extract the Shadowsocks configuration along with the flag."""
+    # Match valid ss:// configurations
+    match = re.match(r"(ss://[a-zA-Z0-9+/=]+@[^#\s]+)(#.*)?", config_line)
+    if not match:
+        return None
+    base_config = match.group(1)  # Base ss:// config
+    flag_section = match.group(2)  # Extract the part after #
+    
+    if flag_section:
+        # Extract country flag from the flag section (e.g., 🇺🇸)
+        country_flag = re.search(r"[\U0001F1E6-\U0001F1FF]{1,2}", flag_section)
+        country_flag = country_flag.group(0) if country_flag else ""
+    else:
+        country_flag = ""
+    
+    # Create new config with the required format
+    return f"{base_config}#♨️3λΞĐ|{country_flag}"
 
 def extract_ss_configs(decoded_content):
-    """Extract and clean Shadowsocks configurations with numbering."""
+    """Extract and clean Shadowsocks configurations."""
     lines = decoded_content.splitlines()
     cleaned_configs = []
-    for idx, line in enumerate(lines, start=1):
+    for line in lines:
         if line.startswith("ss://"):
             cleaned_config = clean_config(line.strip())
             if cleaned_config:
-                # Append numbering and `#3λΞĐ` to each config
-                cleaned_configs.append(f"{cleaned_config}#♨️3λΞĐ-{idx}")
+                cleaned_configs.append(cleaned_config)
     logger.info(f"Extracted {len(cleaned_configs)} valid ss:// configs.")
     return cleaned_configs
-
 
 def save_to_file(header, configs, file_name):
     """Save the header and configurations to the output file."""
     try:
         with open(file_name, "w", encoding="utf-8") as f:
-            f.write(header)
-            f.write("\n\n")
+            f.write(header)  # Write header first
+            f.write("\n\n")   # Add a blank line before configs
             for config in configs:
                 f.write(config + "\n")
         logger.info(f"Configs saved to {file_name}.")
     except Exception as e:
         logger.error(f"Failed to save configs to file: {e}")
-
 
 def main():
     """Main execution flow."""
@@ -100,7 +107,7 @@ def main():
         logger.error("Failed to decode content. Exiting...")
         return
 
-    # Extract and clean valid configurations
+    # Extract and clean configurations
     ss_configs = extract_ss_configs(decoded_content)
     if not ss_configs:
         logger.warning("No valid ss:// configs found.")
@@ -109,7 +116,6 @@ def main():
     # Save configurations with header to the output file
     save_to_file(HEADER, ss_configs, OUTPUT_FILE)
     logger.info("Process completed successfully!")
-
 
 if __name__ == "__main__":
     main()
