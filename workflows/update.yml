@@ -1,0 +1,55 @@
+name: Update fetcher
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+
+jobs:
+  update-configs:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+    
+    - name: Set up Python
+      uses: actions/setup-python@v3
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install requests
+    
+    - name: Run outline fetcher
+      run: python fetcher.py
+    
+    - name: Check if configs.txt exists
+      run: |
+        if [ ! -f configs.txt ]; then
+          echo "configs.txt was not created!"
+          exit 1
+        fi
+    
+    - name: Display configs.txt
+      run: cat configs.txt
+    
+    - name: List files
+      run: ls -l
+    
+    - name: Commit and push if changes
+      run: |
+        git config --local user.email "github-actions[bot]@users.noreply.github.com"
+        git config --local user.name "github-actions[bot]"
+        git add configs.txt
+        git status
+        if git diff --staged --quiet; then
+          echo "No changes detected in config.tex"
+        else
+          git commit -m "Update configs [skip ci]"
+          git push
+        fi
