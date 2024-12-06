@@ -65,7 +65,7 @@ def clean_config(config_line):
         country_flag = ""
     
     # Create new config with the required format
-    return f"{base_config}#♨️3λΞĐ|{country_flag}"
+    return f"{base_config}#♨️3λΞĐ |{country_flag}"
 
 def extract_ss_configs(decoded_content):
     """Extract and clean Shadowsocks configurations."""
