@@ -17,7 +17,6 @@ URL = "https://raw.githubusercontent.com/3yed82/telegram-configs-collector/refs/
 # Output file name
 OUTPUT_FILE = "Export/clean-configs.txt"
 
-
 def fetch_content(url):
     """Download content from the given URL."""
     try:
@@ -73,12 +72,10 @@ def filter_valid_configs(content):
     logger.info(f"Extracted {len(valid_configs)} valid configs.")
     return valid_configs
 
-def save_to_file(header, configs, file_name):
-    """Save the header and content to the output file."""
+def save_to_file(configs, file_name):
+    """Save the content to the output file."""
     try:
         with open(file_name, "w", encoding="utf-8") as f:
-            f.write(header)
-            f.write("\n\n")
             for config in configs:
                 f.write(config + "\n")
         logger.info(f"Configs saved to {file_name}.")
@@ -107,7 +104,7 @@ def main():
         logger.warning("No valid configs found.")
         return
 
-    # Save valid configs with header to the output file
+    # Save valid configs to the output file
     save_to_file(valid_configs, OUTPUT_FILE)
     logger.info("Process completed successfully!")
 
