@@ -3,6 +3,7 @@ import base64
 import logging
 import re
 import socket
+import os
 
 # Logging configuration
 logging.basicConfig(
@@ -41,40 +42,66 @@ def decode_base64(content):
         logger.error(f"Failed to decode Base64 content: {e}")
         return None
 
-def validate_config(config):
-    """Validate a Shadowsocks config by checking format and testing connection."""
+def extract_config_details(config):
+    """Extract and parse details from a Shadowsocks config."""
     try:
-        # Extract the host and port from the config
-        match = re.match(r"ss://[a-zA-Z0-9+/=]+@([^:]+):(\d+)", config)
+        match = re.match(r"ss://([a-zA-Z0-9+/=]+)@([^:]+):(\d+)", config)
         if not match:
             logger.warning(f"Invalid config format: {config}")
-            return False
+            return None
 
-        host, port = match.groups()
+        base64_part, host, port = match.groups()
 
+        # Decode Base64 to extract method and password
+        decoded_part = base64.b64decode(base64_part).decode("utf-8")
+        method, password = decoded_part.split(":", 1)
+        return {"method": method, "password": password, "host": host, "port": port}
+    except Exception as e:
+        logger.error(f"Failed to extract details from config: {config} - {e}")
+        return None
+
+def rebuild_base64_config(details):
+    """Rebuild a Shadowsocks config into Base64 format."""
+    try:
+        base64_part = base64.b64encode(f"{details['method']}:{details['password']}".encode("utf-8")).decode("utf-8")
+        return f"ss://{base64_part}@{details['host']}:{details['port']}"
+    except Exception as e:
+        logger.error(f"Failed to rebuild config to Base64: {details} - {e}")
+        return None
+
+def validate_and_reencode_config(config):
+    """Validate and re-encode a Shadowsocks config."""
+    details = extract_config_details(config)
+    if not details:
+        return None
+
+    try:
         # Test if the port is open
-        with socket.create_connection((host, int(port)), timeout=5):
+        with socket.create_connection((details["host"], int(details["port"])), timeout=5):
             logger.info(f"Config is valid: {config}")
-            return True
+            return rebuild_base64_config(details)
     except Exception as e:
         logger.warning(f"Failed to validate config: {config} - {e}")
-        return False
+        return None
 
 def filter_valid_configs(content):
-    """Extract and validate Shadowsocks configs."""
+    """Extract, validate, and re-encode Shadowsocks configs."""
     lines = content.splitlines()
     valid_configs = []
     for line in lines:
         if line.startswith("ss://"):
             config = line.strip()
-            if validate_config(config):
-                valid_configs.append(config)
+            reencoded_config = validate_and_reencode_config(config)
+            if reencoded_config:
+                valid_configs.append(reencoded_config)
     logger.info(f"Extracted {len(valid_configs)} valid configs.")
     return valid_configs
 
 def save_to_file(configs, file_name):
     """Save the content to the output file."""
     try:
+        # Ensure the output directory exists
+        os.makedirs(os.path.dirname(file_name), exist_ok=True)
         with open(file_name, "w", encoding="utf-8") as f:
             for config in configs:
                 f.write(config + "\n")
@@ -98,7 +125,7 @@ def main():
         logger.error("Failed to decode content. Exiting...")
         return
 
-    # Validate and filter configs
+    # Validate, re-encode, and filter configs
     valid_configs = filter_valid_configs(decoded_content)
     if not valid_configs:
         logger.warning("No valid configs found.")
