@@ -11,7 +11,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # URL for fetching configurations
-URL = "https://raw.githubusercontent.com/3yed82/telegram-configs-collector/refs/heads/main/protocols/shadowsocks"
+URL = "https://raw.githubusercontent.com/3yed82/Shadowsocks/refs/heads/main/Export/clean-configs.txt"
 
 # Output file name
 OUTPUT_FILE = "configs.txt"
