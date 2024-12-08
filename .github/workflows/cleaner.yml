@@ -50,7 +50,7 @@ jobs:
         if git diff --staged --quiet; then
           echo "No changes detected in Export/clean-configs.txt"
         else
-          git commit -m "Update configs [skip ci]"
+          git commit -m "Update configs"
           git pull --rebase origin main
           git push
         fi
