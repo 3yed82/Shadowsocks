@@ -1,35 +1,55 @@
-name: Shadowsocks Config cleaner
+name: Shadowsocks Config Cleaner
 
 on:
   schedule:
-   
-    - cron: '0 0 * * *'
+    - cron: '0 3 * * *'
   workflow_dispatch:
 
 jobs:
-  collect-configs:
+  update-configs:
     runs-on: ubuntu-latest
-
+    permissions:
+      contents: write
+    
     steps:
-    - name: Checkout Repository
+    - name: Checkout repository
       uses: actions/checkout@v3
-
+    
     - name: Set up Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v3
       with:
-        python-version: '3.9'
-
-    - name: Install Dependencies
+        python-version: '3.11'
+    
+    - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install -r requirements.txt
-
-    - name: Run Shadowsocks Config Collector
+        pip install requests
+    
+    - name: Run Config Cleaner
+      run: python config-cleaner.py
+    
+    - name: Check if Export/clean-configs.txt exists
       run: |
-        python config-cleaner.py
-
-    - name: Upload Results as Artifact
-      uses: actions/upload-artifact@v3
-      with:
-        name: shadowsocks-configs
-        path: Export/clean-configs.txt
+        if [ ! -f Export/clean-configs.txt ]; then
+          echo "Export/clean-configs.txt was not created!"
+          exit 1
+        fi
+    
+    - name: Display clean-configs.txt
+      run: cat Export/clean-configs.txt
+    
+    - name: List files
+      run: ls -l Export
+    
+    - name: Commit and push if changes
+      run: |
+        git config --local user.email "github-actions[bot]@users.noreply.github.com"
+        git config --local user.name "github-actions[bot]"
+        git add Export/clean-configs.txt
+        git status
+        if git diff --staged --quiet; then
+          echo "No changes detected in Export/clean-configs.txt"
+        else
+          git commit -m "Update configs [skip ci]"
+          git push
+        fi
