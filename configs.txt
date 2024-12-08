@@ -1,1 +1,8 @@
+//profile-title: base64:4pyU77iPM867zp7EkPCflLgoU2hhZG93c29ja3Mp
+//profile-update-interval: 24
+//subscription-userinfo: upload=5368709120; download=445097156608; total=955630223360; expire=1762677732
+//support-url: https://t.me/talk_to_3yed_bot
+//profile-web-page-url: https://github.com/3yed-61
 
+
+ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTo1Y3A5WjNpV25KWjI=@205.134.180.150:443#♨️3λΞĐ |
