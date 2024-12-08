@@ -4,6 +4,7 @@ import logging
 import re
 import socket
 import os
+import dns.resolver
 
 # Logging configuration
 logging.basicConfig(
@@ -60,10 +61,39 @@ def extract_config_details(config):
         logger.error(f"Failed to extract details from config: {config} - {e}")
         return None
 
+def validate_host(host):
+    """Validate if the host (IP or domain) is reachable."""
+    try:
+        # Try to resolve the domain to an IP address
+        dns.resolver.resolve(host, "A")
+        logger.info(f"Host {host} is valid.")
+        return True
+    except Exception as e:
+        logger.warning(f"Host {host} is invalid: {e}")
+        return False
+
+def validate_encryption_method(method):
+    """Validate if the encryption method is supported."""
+    valid_methods = [
+        "aes-256-gcm", "aes-128-gcm", "chacha20-ietf-poly1305",
+        "xchacha20-ietf-poly1305", "aes-256-cfb", "aes-128-cfb"
+    ]
+    if method.lower() in valid_methods:
+        return True
+    else:
+        logger.warning(f"Invalid encryption method: {method}")
+        return False
+
 def validate_and_reencode_config(config):
     """Validate and re-encode a Shadowsocks config."""
     details = extract_config_details(config)
     if not details:
+        return None
+
+    if not validate_encryption_method(details["method"]):
+        return None
+
+    if not validate_host(details["host"]):
         return None
 
     try:
