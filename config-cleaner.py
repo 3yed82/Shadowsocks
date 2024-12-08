@@ -104,8 +104,10 @@ def save_to_file(configs, file_name):
         os.makedirs(os.path.dirname(file_name), exist_ok=True)
         with open(file_name, "w", encoding="utf-8") as f:
             for config in configs:
-                f.write(config + "\n")
-        logger.info(f"Configs saved to {file_name}.")
+                # Encode the entire config as Base64 and save
+                base64_config = base64.b64encode(config.encode("utf-8")).decode("utf-8")
+                f.write(base64_config + "\n")
+        logger.info(f"Configs saved to {file_name} in Base64 format.")
     except Exception as e:
         logger.error(f"Failed to save configs to file: {e}")
 
