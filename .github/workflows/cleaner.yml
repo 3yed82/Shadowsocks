@@ -1,4 +1,4 @@
-name: Shadowsocks Config Collector
+name: Shadowsocks Config cleaner
 
 on:
   schedule:
