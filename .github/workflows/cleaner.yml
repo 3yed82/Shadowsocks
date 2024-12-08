@@ -42,16 +42,15 @@ jobs:
       run: ls -l Export
     
     - name: Commit and push if changes
-  run: |
-    git config --local user.email "github-actions[bot]@users.noreply.github.com"
-    git config --local user.name "github-actions[bot]"
-    git add Export/clean-configs.txt
-    git status
-    if git diff --staged --quiet; then
-      echo "No changes detected in Export/clean-configs.txt"
-    else
-      git commit -m "Update configs [skip ci]"
-      git pull --rebase origin main
-      git push
-    fi
+      run: |
+        git config --local user.email "github-actions[bot]@users.noreply.github.com"
+        git config --local user.name "github-actions[bot]"
+        git add Export/clean-configs.txt
+        git status
+        if git diff --staged --quiet; then
+          echo "No changes detected in Export/clean-configs.txt"
+        else
+          git commit -m "Update configs [skip ci]"
+          git pull --rebase origin main
+          git push
         fi
