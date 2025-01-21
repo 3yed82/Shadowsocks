@@ -11,10 +11,10 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # URL for fetching configurations
-URL = "https://raw.githubusercontent.com/3yed-61/Shadowsocks/refs/heads/main/Export/clean-configs.txt"
+URL = "https://raw.githubusercontent.com/3yed-61/Shadowsocks/refs/heads/main/Export/clean-configs.json"
 
 # Output file name
-OUTPUT_FILE = "configs.txt"
+OUTPUT_FILE = "configs.json"
 
 # Header to include in the output file
 HEADER = """//profile-title: base64:4pyU77iPM867zp7EkPCflLgoU2hhZG93c29ja3Mp
