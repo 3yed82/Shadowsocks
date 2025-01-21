@@ -28,15 +28,15 @@ jobs:
     - name: Run outline fetcher
       run: python fetcher.py
     
-    - name: Check if configs.txt exists
+    - name: Check if configs.json exists
       run: |
-        if [ ! -f configs.txt ]; then
-          echo "configs.txt was not created!"
+        if [ ! -f configs.json ]; then
+          echo "configs.json was not created!"
           exit 1
         fi
     
-    - name: Display configs.txt
-      run: cat configs.txt
+    - name: Display configs.json
+      run: cat configs.json
     
     - name: List files
       run: ls -l
@@ -45,7 +45,7 @@ jobs:
       run: |
         git config --local user.email "github-actions[bot]@users.noreply.github.com"
         git config --local user.name "github-actions[bot]"
-        git add configs.txt
+        git add configs.json
         git status
         if git diff --staged --quiet; then
           echo "No changes detected in config.tex"
