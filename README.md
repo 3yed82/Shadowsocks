@@ -16,5 +16,5 @@
 **SUB LINK** :
 
 ```POV-Ray SDL
-https://raw.githubusercontent.com/3yed82/Shadowsocks/refs/heads/main/configs.txt
+https://raw.githubusercontent.com/3yed82/Shadowsocks/refs/heads/main/configs.json
 ```
